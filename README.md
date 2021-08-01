@@ -12,7 +12,7 @@ If you haven't yet, you can setup hadoop in your local using the following links
 Using Powershell, go to %HADOOP_HOME%/sbin to start up hdfs and yarn
 
 ```shell
-cd %HADOOP_HOME/sbin
+cd %HADOOP_HOME%/sbin
 ./start-dfs.cmd
 ./start-yarn.cmd
 ```
@@ -30,7 +30,7 @@ cd %DERBY_HOME%\bin
 StartNetworkServer -h 0.0.0.0
 ```
 
-Using powershell/cmd, Start up Hive metastore server and hiveQL
+Using powershell/cygwin, Start up Hive metastore server and hiveQL
 
 ```shell
 hive --service hiveserver2 start
@@ -57,9 +57,7 @@ Go to hive and run the following
 create database test_schema;
 use test_schema;
 
-CREATE TABLE IF NOT EXISTS residential_property_transactions( sn STRING, project_name STRING, street_name STRING, type STRING,
- postal_district STRING, market_segment STRING, tenure STRING, type_of_sale STRING, no_of_units STRING, price_sgd STRING, nett_price_sgd STRING,
-area_sqft STRING, type_of_area STRING, floor_level STRING, unit_price_psf STRING, date_of_sale STRING)
+CREATE TABLE IF NOT EXISTS residential_property_transactions( sn STRING, project_name STRING, street_name STRING, type STRING, postal_district STRING, market_segment STRING, tenure STRING, type_of_sale STRING, no_of_units STRING, price_sgd STRING, nett_price_sgd STRING, area_sqft STRING, type_of_area STRING, floor_level STRING, unit_price_psf STRING, date_of_sale STRING)
     ROW FORMAT DELIMITED
     FIELDS TERMINATED BY ','
     STORED AS TEXTFILE
@@ -80,6 +78,21 @@ Go to hive and run the following. The output should be 1418
 msck repair table test_schema.residential_property_transactions;
 select count(*) from test_schema.residential_property_transactions
 
+```
+
+Create another table that is using Parquet format
+
+```shell
+create database test_schema;
+use test_schema;
+
+CREATE TABLE IF NOT EXISTS residential_property_transactions_parquet( sn INT, project_name STRING, street_name STRING, type STRING, postal_district STRING, market_segment STRING, tenure STRING, type_of_sale STRING, no_of_units INT, price_sgd INT, nett_price_sgd INT, area_sqft INT, type_of_area STRING, floor_level STRING, unit_price_psf INT, date_of_sale STRING) STORED AS PARQUET location 'hdfs://localhost:9820/residential_property_transactions_parquet/';
+```
+
+Test if we are able to insert data from the CSV table to parquet table. If yes, then that means our CSV can sync with the parquet table which we will use spark for
+
+```shell
+insert overwrite table residential_property_transactions_parquet select cast(sn as int), project_name, street_name, type,  postal_district, market_segment, tenure, type_of_sale, cast(no_of_units as int), cast(price_sgd as int), cast(nett_price_sgd as int), cast(area_sqft as int), type_of_area, floor_level, cast(unit_price_psf as int), date_of_sale from residential_property_transactions;
 ```
 
 ## Test Spark Connectivity
