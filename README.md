@@ -34,6 +34,7 @@ Using powershell/cygwin, Start up Hive metastore server and hiveQL
 
 ```shell
 hive --service hiveserver2 start
+# use cygwin for below
 $HIVE_HOME/hcatalog/sbin/webhcat_server.sh start
 ```
 
@@ -42,6 +43,13 @@ Test hive connectivity
 ```shell
 hive
 show databases
+```
+
+Start up hcat server to later let spark connect to thrift server
+
+```shell
+# use cygwin for below
+./hcatalog/sbin/hcat_server.sh start
 ```
 
 Accessible URLS
