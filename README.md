@@ -34,8 +34,6 @@ Using powershell/cygwin, Start up Hive metastore server and hiveQL
 
 ```shell
 hive --service hiveserver2 start
-# use cygwin for below
-$HIVE_HOME/hcatalog/sbin/webhcat_server.sh start
 ```
 
 Test hive connectivity
@@ -45,11 +43,12 @@ hive
 show databases
 ```
 
-Start up hcat server to later let spark connect to thrift server
+Start up hcat server to later let spark connect to thrift server (NOTE: use cygwin)
 
 ```shell
 # use cygwin for below
 ./hcatalog/sbin/hcat_server.sh start
+./hcatalog/sbin/webhcat_server.sh start
 ```
 
 Accessible URLS
@@ -69,8 +68,7 @@ CREATE TABLE IF NOT EXISTS residential_property_transactions( sn STRING, project
     ROW FORMAT DELIMITED
     FIELDS TERMINATED BY ','
     STORED AS TEXTFILE
-    location 'hdfs://localhost:9820/residential_property_transactions/'
-    tblproperties ("skip.header.line.count"="1");
+    location 'hdfs://localhost:9820/residential_property_transactions/';
 ```
 
 (Optional) Populate the hdfs with our test data to see if we will be able to fetch the content properly
@@ -120,3 +118,17 @@ Test if you are able to run one of Spark's default test programs by running belo
 ```
 
 While a spark-shell instance is running, go to http://localhost:4040/ and see if you are able to access properly.
+
+## Running the spark job
+
+You can build this jar file by using below simple command
+
+```shell
+mvn package
+```
+
+Then trigger job as below (provided you have done hdfs/hive/spark setup in your local machine).
+
+```shell
+spark-submit --class "SparkIngestorApp" --master local[4] .\target\spark-csv-ingestor-1.0.jar
+```

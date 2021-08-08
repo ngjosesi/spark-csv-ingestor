@@ -1,8 +1,8 @@
 <project>
-  <groupId>edu.berkeley</groupId>
-  <artifactId>simple-project</artifactId>
+  <groupId>com.rocketowl.demo.spark.java</groupId>
+  <artifactId>spark-csv-ingestor</artifactId>
   <modelVersion>4.0.0</modelVersion>
-  <name>Simple Project</name>
+  <name>Spark CSV Ingestor</name>
   <packaging>jar</packaging>
   <version>1.0</version>
   <build>
