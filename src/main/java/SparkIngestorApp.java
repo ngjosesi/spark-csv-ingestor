@@ -25,9 +25,18 @@ public class SparkIngestorApp {
                          .getOrCreate();
 
     logger.info("Reading the file: {}", sourceFile);
-    Dataset<Row> data = spark.read().csv(sourceFile).coalesce(1);
+    Dataset<Row> data = spark.read().csv(sourceFile).toDF("sn", "project_name", "street_name", "type",  "postal_district", "market_segment",
+                                                          "tenure", "type_of_sale", "no_of_units", "price_sgd", "nett_price_sgd", "area_sqft",
+                                                          "type_of_area", "floor_level", "unit_price_psf", "date_of_sale");
     long expectedCountCheck = data.count();
     logger.info("Total rows of data in the file is {}", expectedCountCheck);
+
+    data = data.withColumn("sn",data.col("sn").cast("int"))
+               .withColumn("no_of_units",data.col("no_of_units").cast("int"))
+               .withColumn("price_sgd",data.col("price_sgd").cast("int"))
+               .withColumn("nett_price_sgd",data.col("nett_price_sgd").cast("int"))
+               .withColumn("area_sqft",data.col("area_sqft").cast("int"))
+               .withColumn("unit_price_psf",data.col("unit_price_psf").cast("int"));
 
     logger.info("Writing into parquet location");
     data.write().mode("overwrite").parquet(destinationFolder);
